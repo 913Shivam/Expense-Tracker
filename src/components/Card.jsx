@@ -1,6 +1,7 @@
 import MiniCard from "./MiniCard";
 import MidCard from "./MidCard";
 import TransactionCard from "./TransactionCard";
+import ChartCard from "./ChartCard";
 import { useRef, useState } from "react";
 
 function Card() {
@@ -33,6 +34,23 @@ function Card() {
   let categoryRef = useRef();
   let noteRef = useRef();
   let [data, setData] = useState(initialData);
+  const calculatePieData = (dataArray) => {
+    return dataArray
+      .filter((item) => item.status === "Expenses")
+      .reduce((acc, item) => {
+        const existing = acc.find((obj) => obj.category === item.category);
+        if (existing) {
+          existing.amount += Number(item.amount);
+        } else {
+          acc.push({
+            category: item.category,
+            amount: Number(item.amount),
+          });
+        }
+        return acc;
+      }, []);
+  };
+  let piedata = calculatePieData(data);
 
   const getValue = (e) => {
     e.preventDefault();
@@ -63,6 +81,22 @@ function Card() {
     localStorage.setItem("data", JSON.stringify(updatedData));
     e.target.reset();
   };
+  const deleteTransaction = (index) => {
+    const amount = Number(data[index].amount);
+    let currentDetail = [...detail];
+    if (data[index].status === "Expenses") {
+      currentDetail[1].price = detail[1].price - amount;
+    } else {
+      currentDetail[0].price = detail[0].price - amount;
+    }
+    currentDetail[2].price = currentDetail[0].price - currentDetail[1].price;
+    setDetail(currentDetail);
+    let deletedata = (prev) => prev.filter((_, i) => i !== index);
+    let updatedData = deletedata(data);
+    setData(updatedData);
+    localStorage.setItem("detail", JSON.stringify(currentDetail));
+    localStorage.setItem("data", JSON.stringify(updatedData));
+  };
 
   return (
     <>
@@ -85,7 +119,11 @@ function Card() {
           handleToChangeStatus={handleToChangeStatus}
         ></MidCard>
       </div>
-      <TransactionCard status={status} data={data}></TransactionCard>
+      <ChartCard piedata={piedata}></ChartCard>
+      <TransactionCard
+        data={data}
+        deleteTransaction={deleteTransaction}
+      ></TransactionCard>
     </>
   );
 }

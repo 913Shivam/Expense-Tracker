@@ -1,8 +1,8 @@
-function Transaction({ item }) {
+function Transaction({ item,index,deleteTransaction }) {
   let textcolor = "blue";
   let amount = "+$" + item.amount;
   if (item.status === "Expenses") {
-    textcolor = "orange";
+    textcolor = "orange"; 
     amount = "-$" + item.amount;
   }
   return (
@@ -22,7 +22,7 @@ function Transaction({ item }) {
           <div className="text-md font-semibold" style={{ color: textcolor }}>
             {amount}
           </div>
-          <div className="text-sm hover:scale-120 transition-all cursor-pointer ">
+          <div className="text-sm hover:scale-120 transition-all cursor-pointer" onClick={() => deleteTransaction(index)}>
             ❌
           </div>
         </div>
