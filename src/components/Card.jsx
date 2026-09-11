@@ -34,9 +34,9 @@ function Card() {
   let categoryRef = useRef();
   let noteRef = useRef();
   let [data, setData] = useState(initialData);
-  const calculatePieData = (dataArray) => {
+  const calculatePieData = (dataArray, type) => {
     return dataArray
-      .filter((item) => item.status === "Expenses")
+      .filter((item) => item.status === type)
       .reduce((acc, item) => {
         const existing = acc.find((obj) => obj.category === item.category);
         if (existing) {
@@ -50,7 +50,8 @@ function Card() {
         return acc;
       }, []);
   };
-  let piedata = calculatePieData(data);
+  let expensepiedata = calculatePieData(data, "Expenses");
+  let incomepiedata = calculatePieData(data, "Income");
 
   const getValue = (e) => {
     e.preventDefault();
@@ -119,7 +120,10 @@ function Card() {
           handleToChangeStatus={handleToChangeStatus}
         ></MidCard>
       </div>
-      <ChartCard piedata={piedata}></ChartCard>
+      <ChartCard
+        expensepiedata={expensepiedata}
+        incomepiedata={incomepiedata}
+      ></ChartCard>
       <TransactionCard
         data={data}
         deleteTransaction={deleteTransaction}
